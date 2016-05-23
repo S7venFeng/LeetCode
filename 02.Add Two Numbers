@@ -1,0 +1,66 @@
+struct ListNode* addTwoNumbers(struct ListNode* l1, struct ListNode* l2) {
+    /* carry flag */
+    bool carryFlag = false;
+    if(NULL==l1||NULL==l2)
+    {
+        return NULL;
+    }
+    struct ListNode* sumNodeList = (struct ListNode*)malloc(sizeof(struct ListNode));
+
+    if(NULL==sumNodeList)
+    {
+        return NULL;
+    }
+    sumNodeList->next = NULL;
+    struct ListNode* p1 = l1;
+    struct ListNode* p2 = l2;
+    struct ListNode* p = sumNodeList;
+
+    int sumVal = 0;
+    /* add ListNode l1 and ListNode l2 in verser mode */
+    for (;p1!=NULL||p2!=NULL;) {
+        if(p1==NULL)
+        {
+            sumVal = p2->val;
+        }
+        if(p2==NULL)
+            sumVal = p1->val;
+        if(p1!=NULL&&p2!=NULL)
+            sumVal = p1->val+p2->val;
+
+        sumVal = (carryFlag==true)?sumVal+1:sumVal;
+        if(sumVal>=10)
+        {
+            carryFlag = true;
+            sumVal = sumVal - 10;
+        }
+        else
+        {
+            carryFlag = false;
+        }
+        struct ListNode* node = (struct ListNode*)malloc(sizeof(struct ListNode));
+        if(node)
+        {
+            node->val = sumVal;
+            node->next = NULL;
+            p->next = node;
+            p = node;
+            p1 = (p1!=NULL)?p1->next:p1;
+            p2 = (p2!=NULL)?p2->next:p2;
+            /* the last num */
+            if(p1==NULL&&p2==NULL&&carryFlag==true)
+            {
+                struct ListNode* node = (struct ListNode*)malloc(sizeof(struct ListNode));
+                if(node) {
+                    node->val = 1;
+                    node->next = NULL;
+                    p->next = node;
+                    p = node;
+                }
+            }
+        }
+
+    }
+    p->next = NULL;
+    return sumNodeList->next;
+}
