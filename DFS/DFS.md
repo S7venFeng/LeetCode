@@ -1,6 +1,149 @@
-# DFS搜索系列题
+# DFS  & BFS搜索系列题
 
+DFS和BFS是用的最多的搜索手段，两种方法在搜索维度上有较大的不同，具体不同如下：
 
+1. DFS搜索空间复杂度依赖于搜索深度，而搜索过程中会用到栈来保存，如果大于C++目前的栈容量（4Mb，约10w深度）就会爆栈；另外DFS时间复杂度最坏情况下特别差
+2. BFS搜索空间复杂度是指数级别的，因为每次搜索的是一层，一层加上后面一层，另外**BFS有最短最小的属性，一般在求图的最小路径等问题上会率先采用**
+
+DFS写起来比BFS简单一些，但是一定要注意题目规模，如果题目规模较大，尽量采用BFS
+
+## 搜索经典模板题：
+
+#### [111. 二叉树的最小深度](https://leetcode-cn.com/problems/minimum-depth-of-binary-tree/)
+
+给定一个二叉树，找出其最小深度。
+
+最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+
+说明: 叶子节点是指没有子节点的节点。
+
+示例:
+
+给定二叉树 [3,9,20,null,null,15,7],
+
+     3
+    / \
+    9  20
+    /  \
+    15   7
+
+ 返回它的最小深度  2.
+
+### 思路一（DFS）：
+
+这题是一道经典的数遍历题，题目要求是让我们找根节点到叶子节点的最小深度，此处需要根据几个条件来判断下：
+
+1. 无当前节点
+2. 当前节点只有左子树或者右子树
+3. 当前节点两个子树都有
+
+注意第二个条件下，两边只返回左子树或者右子树的深度（不是取min，因为一边深度是0），第三个条件是取两个子树的最小深度。
+
+知道以上条件后递归调用即可
+
+```c++
+class Solution {
+public:
+    int dfs(TreeNode* root) {
+        if (!root->left && !root->right) {
+            return 1;
+        }
+        int l = 0;
+        int r = 0;
+        if (root->left) {
+            l = dfs(root->left) + 1;
+        } else {
+            l = INT_MAX;
+        }
+        if (root->right) {
+            r = dfs(root->right) + 1;
+        } else {
+            r = INT_MAX;
+        }
+        return min(l, r);
+    }
+    int minDepth(TreeNode* root) {
+        if (!root) return 0;
+        return dfs(root);
+    }
+};
+```
+
+简捷版：
+
+```c++
+class Solution {
+public:
+    int minDepth(TreeNode* root) {
+        if (!root) return 0;
+        if (root->left && !root->right) {
+            return minDepth(root->left) + 1;
+        }
+        if (!root->left && root->right) {
+            return minDepth(root->right) + 1;
+        }
+        return min(minDepth(root->left), minDepth(root->right)) + 1;
+    }
+};
+```
+
+**时间复杂度：**我们会访问到所有节点，所以此处的时间复杂度是**O(N)**
+
+**空间复杂度：** 最坏的情况下，该树根节点只有一个子树，深度就是所有节点的个数，空间复杂度为**O(N)**；最好的情况下，该树节点是个平衡树，这时我们的过程栈只需要保存它的高度个节点logN，所以空间复杂度是**O(logN)**
+
+### 思路二（BFS）：
+
+用BFS来做的话这道就是最简单的模板题，先将根节点推入队列，然后开始循环判断队列是否为空，不为空则依次出队，注意出队是要保存下当前层数（也就是深度），每一层ans++，当出队的当前节点是叶子节点时，就代表我们已经找到了最小的深度了（这就是BFS的最小属性，一旦找到第一个符合条件的，必定该节点是最短路径）此时直接返回ans即可。
+
+```c++
+class Solution {
+public:
+    int minDepth(TreeNode* root) {
+        if (!root) return 0;
+        queue<TreeNode*> q;
+        q.push(root);
+        int ans = 0;
+        while (!q.empty()) {
+            int cnt = q.size();
+            ans++;
+            while (cnt) {
+                TreeNode* now = q.front();
+                q.pop();
+                if (!now->left && !now->right) {
+                    return ans;
+                }
+                if (now->left) {
+                    q.push(now->left);
+                }
+                if (now->right) {
+                    q.push(now->right);
+                }
+                cnt--;
+            }
+        }
+        return ans;
+    }
+};
+```
+
+**时间复杂度**：最坏的情况下，这是一颗平衡树，以为着我们每层都得遍历，这样我们遍历了除了最后一层的N/2个节点，时间复杂度**O(N)**
+
+**空间复杂度**：用了一个队列来保存N个节点，同样是**O(N)**
+
+#### [279. 完全平方数](https://leetcode-cn.com/problems/perfect-squares/)
+
+给定正整数 n，找到若干个完全平方数（比如 1, 4, 9, 16, ...）使得它们的和等于 n。你需要让组成和的完全平方数的个数最少。
+
+示例 1:
+
+输入: n = 12
+输出: 3 
+解释: 12 = 4 + 4 + 4.
+示例 2:
+
+输入: n = 13
+输出: 2
+解释: 13 = 4 + 9.
 
 
 
