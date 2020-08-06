@@ -145,6 +145,193 @@ public:
 输出: 2
 解释: 13 = 4 + 9.
 
+### 这是我做到非常差的一道题目，主要是使用DFS和BFS不注意的话都会超时
+
+### 思路一（DFS）：
+
+题目意思很清楚，让你求把N个完全平方数的和凑到和目标数字相同，然后要让这个N最小。很明显，公式可以列为：F(n) = F(n-i) + 1
+
+这个公式我们可以用DFS的方式来解，因为F(n)和F(n - i)其实是存在递推关系的，这也是DP问题的雏形，此处我们列举所有平方小于n的i，将两者的差值
+
+代入到DFS递归方法里面去计算，一旦满足n-i的值等于0时意味着我们找到了一个符合条件的情况。**此时需要注意，这并不是最优解（DFS特征，需要搜索完），我们需要保存下来，每次符合条件时都要去判断下是否能够更新答案，搜索完成后的最优解才能出现**
+
+为了避免超时，这里我们要用到记忆化数组来保存中间计算的结果，当出现相同的数字时，我们如果已经计算过这个数字的最优平方数则直接返回，无需计算
+
+PS：奇怪的是，此处我用unordered_map保存中间结果会超时，改成vector就行了
+
+```c++
+class Solution {
+public:
+    int dfs(vector<int> &nums, int n, vector<int> &mo) {
+        if (n == 0) return 0;
+        if (mo[n]) {
+            return mo[n];
+        }
+        int mn = INT_MAX;
+        for (int i = nums.size() - 1; i >= 0; --i) {
+            if (n - nums[i] < 0) continue;
+            mn = min(mn, 1 + dfs(nums, n - nums[i], mo));
+        }
+        mo[n] = mn;
+        return mn;
+    }
+
+    int numSquares(int n) {
+        vector<int> nums;
+        for (int i = 1; (i * i) <= n; ++i) {
+            nums.push_back(i * i);
+        }
+        vector<int> mo(n + 1);
+        return dfs(nums, n, mo);
+    }
+};
+```
+
+**思路二（BFS）：**
+
+此题BFS也算是模板BFS，可以加入贪心策略来做，此处还是按照常规的模板来实现的。思路是从0开始自顶向下来搜索，把满足平方小于n的数都加上当前的数（0），结果放入队列，下一层取出所有队列里面的数继续上述操作，当找到第一个满足条件的数时此时的层数就是答案。
+
+**需要注意的是，此处同样要用一个记忆化数组来保存中间计算过的数字，当计算过我们则不需要再压入队列了**
+
+```c++
+class Solution {
+public:
+    int numSquares(int n) {
+        vector<int> v;
+        for (int i = 1; i * i <= n; ++i) {
+            v.push_back(i * i);
+        }
+        queue<int> q;
+        vector<bool> isVisited(n + 1);
+        q.push(0);
+        isVisited[0] = true;
+        int ans = 0;
+        while (!q.empty()) {
+            int cnt = q.size();
+            ans++;
+            while (cnt) {
+                int now = q.front();
+                q.pop();
+                if (now == n) {
+                    return ans - 1;
+                }
+                for (int i = v.size() - 1; i >= 0; --i) {
+                    if (v[i] + now > n || isVisited[v[i] + now]) continue;
+                    isVisited[v[i] + now] = true;
+                    q.push(v[i] + now);
+                }
+                --cnt;
+            }
+        }
+        return ans;
+    }
+};
+```
+
+#### [733. 图像渲染](https://leetcode-cn.com/problems/flood-fill/)
+
+有一幅以二维整数数组表示的图画，每一个整数表示该图画的像素值大小，数值在 0 到 65535 之间。
+
+给你一个坐标 (sr, sc) 表示图像渲染开始的像素值（行 ，列）和一个新的颜色值 newColor，让你重新上色这幅图像。
+
+为了完成上色工作，从初始坐标开始，记录初始坐标的上下左右四个方向上像素值与初始坐标相同的相连像素点，接着再记录这四个方向上符合条件的像素点与他们对应四个方向上像素值与初始坐标相同的相连像素点，……，重复该过程。将所有有记录的像素点的颜色值改为新的颜色值。
+
+最后返回经过上色渲染后的图像。
+
+示例 1:
+
+输入: 
+image = [[1,1,1],[1,1,0],[1,0,1]]
+sr = 1, sc = 1, newColor = 2
+输出: [[2,2,2],[2,2,0],[2,0,1]]
+解析: 
+在图像的正中间，(坐标(sr,sc)=(1,1)),
+在路径上所有符合条件的像素点的颜色都被更改成2。
+注意，右下角的像素没有更改为2，
+因为它不是在上下左右四个方向上与初始点相连的像素点。
+
+注意:
+
+- image 和 image[0] 的长度在范围 [1, 50] 内。
+- 给出的初始点将满足 0 <= sr < image.length 和 0 <= sc < image[0].length。
+- image[i][j] 和 newColor 表示的颜色值在范围 [0, 65535]内。
+
+### 经典中的经典，所有DFS & BFS网格搜索的起点！不知道为什么中文把Flood Fill翻译成了图像渲染
+
+### 思路一（DFS）：
+
+代码待补充
+
+### 思路二（BFS）：
+
+BFS模板题，此处需要注意下保存当前节点已经被遍历过，如果不保存的话会出现4个方向又走回来的情况，会出现死循环。
+
+出现与起始点相同又能到达的点我们就把它染色即可
+
+```c++
+class Solution {
+public:
+    int dir[4][2] = {{-1, 0}, {1, 0}, {0, 1}, {0, -1}};
+    vector<vector<int>> floodFill(vector<vector<int>>& image, int sr, int sc, int newColor) {
+        queue<pair<int, int>> q;
+        pair<int, int> begin = {sr, sc};
+        int srColor = image[sr][sc];
+        vector<vector<bool>> isVisited(image.size(), vector<bool>(image[0].size()));
+        q.push(begin);
+        while (!q.empty()) {
+            pair<int, int> now = q.front();
+            q.pop();
+            isVisited[now.first][now.second] = true;
+            image[now.first][now.second] = newColor;
+            for (int i = 0; i < 4; ++i) {
+                pair<int, int> next;
+                next.first = now.first + dir[i][0];
+                next.second = now.second + dir[i][1];
+                if (next.first < 0 || next.first >= image.size() || next.second < 0 || next.second >= image[0].size() || isVisited[next.first][next.second] || image[next.first][next.second] != srColor)                         continue;
+                q.push(next);
+            }
+        }
+        return image;
+    }
+};
+```
+
+#### [542. 01 矩阵](https://leetcode-cn.com/problems/01-matrix/)
+
+给定一个由 0 和 1 组成的矩阵，找出每个元素到最近的 0 的距离。
+
+两个相邻元素间的距离为 1 。
+
+示例 1: 
+输入:
+
+0 0 0
+0 1 0
+0 0 0
+输出:
+
+0 0 0
+0 1 0
+0 0 0
+示例 2: 
+输入:
+
+0 0 0
+0 1 0
+1 1 1
+输出:
+
+0 0 0
+0 1 0
+1 2 1
+注意:
+
+给定矩阵的元素个数不超过 10000。
+给定矩阵中至少有一个元素是 0。
+矩阵中的元素只在四个方向上相邻: 上、下、左、右。
+
+
+
 
 
 ## 岛屿系列题：
