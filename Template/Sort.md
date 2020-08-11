@@ -8,7 +8,7 @@
 
    ```c++
    vector<int> v;
-   sort(v.begin(), v.end(), cmp[](const int &a, const int &b){
+   sort(v.begin(), v.end(), [](const int &a, const int &b){
        return a < b;
    });
    ```
@@ -17,7 +17,7 @@
 
    ```c++
    unorderd_map<int, int> m;
-   sort(m.begin(), m.end(), cmp[](const pair<int, int> &a, const pair<int, int> &b) {
+   sort(m.begin(), m.end(), [](const pair<int, int> &a, const pair<int, int> &b) {
        if (a.first == b.first) {
            return a.second < b.second;
        }
