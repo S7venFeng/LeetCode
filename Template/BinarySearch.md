@@ -20,7 +20,8 @@ int binarySearch(vector<int> &arr) {
     return l;
 }
 
-return lower_bound(arr.begin(), arr.end());
-return upper_bound(arr.begin(), arr.end());
+return binary_search(nums.begin(), nums.end(), target) == false // 判断有序数组里面是否包含target
+return lower_bound(arr.begin(), arr.end(), target) - arr.begin(); // 找到第一个大于等于target的索引位置
+return upper_bound(arr.begin(), arr.end(), target) - arr.begin(); // 找到第一个大于target的索引位置
 ```
 
