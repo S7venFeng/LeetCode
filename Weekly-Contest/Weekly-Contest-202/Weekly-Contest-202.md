@@ -2,7 +2,7 @@
 
 又是打的很差的一场，前两道题十分钟AC后，后面2道就没再写出来。排名又是1000名开外
 
-![image-20200816231209939](C:\Users\S7ven\AppData\Roaming\Typora\typora-user-images\image-20200816231209939.png)
+!(https://github.com/S7venFeng/LeetCode/blob/master/Weekly-Contest/Weekly-Contest-202/Weekly-Contest-202.png)
 
 总结下四道题目吧：
 
