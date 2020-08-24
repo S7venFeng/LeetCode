@@ -7,7 +7,7 @@
 ```C++
 vector<int> p(n);
 int find(int x) {
-    while (p[x] != x) {
+    if (p[x] != x) {
         x = find(p[x]);
     }
     return p[x];
@@ -63,7 +63,7 @@ class Solution {
         public:
         vector<int> p;
         int find(int x) {
-            while (p[x] != x) {
+            if (p[x] != x) {
                 x = find(p[x]);
             }
             return p[x];
@@ -129,7 +129,7 @@ public:
     }
     int find(vector<int> &p, int x)
     {
-        while (p[x] != x) {
+        if (p[x] != x) {
             x = find(p, p[x]);
         }
         return p[x];
